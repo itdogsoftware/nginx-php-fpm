@@ -1,5 +1,5 @@
 #!/bin/bash
-export NGINX_WEB_ROOT=${NGINX_WEB_ROOT:-'/var/www/html'}
+export NGINX_WEB_ROOT=${NGINX_WEB_ROOT:-'/var/www/html/public'}
 export NGINX_PHP_FALLBACK=${NGINX_PHP_FALLBACK:-'/index.php'}
 export NGINX_PHP_LOCATION=${NGINX_PHP_LOCATION:-'\.php'}
 export NGINX_USER=${NGINX_USER:-'nginx'}
