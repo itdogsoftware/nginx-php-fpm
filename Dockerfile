@@ -8,7 +8,7 @@ RUN yum -y install epel-release
 RUN yum -y install nginx supervisor gettext net-tools vim telnet wget unzip \ 
     php-cli php-common php-devel php-fpm php-gd php-mbstring php-mysqlnd php-opcache php-pdo \
     php-process php-soap php-xml php-xmlrpc \
-    php-pecl-zip php php-json php-pear
+    php-pecl-zip php php-json php-pear jpegoptim optipng pngquant
 
 RUN yum clean all
 
