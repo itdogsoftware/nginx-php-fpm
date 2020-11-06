@@ -8,10 +8,11 @@ RUN yum -y install epel-release
 RUN yum -y install nginx supervisor gettext net-tools vim telnet wget unzip \ 
     php-cli php-common php-devel php-fpm php-gd php-mbstring php-mysqlnd php-opcache php-pdo \
     php-process php-soap php-xml php-xmlrpc \
-    php-pecl-zip php php-json php-pear
+    php-pecl-zip php php-json php-pear jpegoptim optipng pngquant \
+    cronie
 
 RUN yum clean all
-
+RUN sed -i "/memory_limit\s=\s/s/=.*/= 512M/" /etc/php.ini
 RUN sed -i "/opcache.huge_code_pages=/s/=.*/=0/" /etc/php.d/10-opcache.ini
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
