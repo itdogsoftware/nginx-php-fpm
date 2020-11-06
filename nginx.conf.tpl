@@ -36,7 +36,7 @@ http {
         index index.php index.html index.htm;
 
         location / {
-            try_files $uri $uri/ $NGINX_PHP_FALLBACK$query_string;
+            try_files $uri $uri/ $NGINX_PHP_FALLBACK?$query_string;
         }
         location ~* $NGINX_PHP_LOCATION$ {
             # CORS Rules Start #
