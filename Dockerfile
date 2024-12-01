@@ -33,8 +33,8 @@ COPY php-fpm.conf.tpl /tmp/php-fpm.conf.tpl
 EXPOSE 80
 
 COPY listener.php /listener.php
-COPY supervisor.ini /etc/supervisord.d/supervisor.ini
-RUN sed -i '/^\[supervisord\]/a user=root' /etc/supervisord.conf
+COPY supervisor.ini /etc/supervisor/conf.d/supervisor.ini
+RUN sed -i '/^\[supervisord\]/a user=root' /etc/supervisor/supervisord.conf
 COPY entrypoint.sh /entrypoint.sh
 RUN sed -i -e 's/\r$//' /entrypoint.sh
 RUN mkdir /run/supervisor
