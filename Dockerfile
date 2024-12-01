@@ -1,19 +1,28 @@
-FROM centos:8
+FROM php:8.3.14-fpm-bullseye
 
 LABEL authors = "Roy To <roy.to@itdogsoftware.co>"
-
-# Install EPEL Repo
-RUN yum -y install epel-release
-
-RUN yum -y install nginx supervisor gettext net-tools vim telnet wget unzip \ 
-    php-cli php-common php-devel php-fpm php-gd php-mbstring php-mysqlnd php-opcache php-pdo \
-    php-process php-soap php-xml php-xmlrpc \
-    php-pecl-zip php php-json php-pear jpegoptim optipng pngquant \
-    cronie
-
-RUN yum clean all
-RUN sed -i "/memory_limit\s=\s/s/=.*/= 512M/" /etc/php.ini
-RUN sed -i "/opcache.huge_code_pages=/s/=.*/=0/" /etc/php.d/10-opcache.ini
+# Add nodejs repo
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+# Install library & necessary service
+RUN apt-get update && apt-get install -y libzip-dev zip libpng-dev cron supervisor vim nodejs gettext-base nginx && rm -rf /var/lib/apt/lists/*
+# Install docker php extensions
+RUN pecl install redis && docker-php-ext-enable redis
+RUN docker-php-ext-install mysqli 
+RUN docker-php-ext-install pdo
+RUN docker-php-ext-install pdo_mysql
+RUN docker-php-ext-install opcache
+RUN docker-php-ext-install zip
+RUN docker-php-ext-install gd
+RUN docker-php-ext-install sockets
+RUN docker-php-ext-install pcntl
+# set production config
+RUN mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
+# enable opcache config
+COPY docker-php-ext-opcache.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
+# Update php config
+RUN sed -i "/memory_limit\s=\s/s/=.*/= 512M/" /usr/local/etc/php/php.ini
+# tune up php-fpm config
+COPY www.conf /usr/local/etc/php-fpm.d/www.conf
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
