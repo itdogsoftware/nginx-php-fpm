@@ -21,14 +21,12 @@ RUN mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 COPY docker-php-ext-opcache.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 # Update php config
 RUN sed -i "/memory_limit\s=\s/s/=.*/= 512M/" /usr/local/etc/php/php.ini
-# tune up php-fpm config
-COPY www.conf /usr/local/etc/php-fpm.d/www.conf
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 RUN rm -f /etc/nginx/sites-enabled/*
 COPY nginx.conf.tpl /tmp/nginx.conf.tpl
-COPY php-fpm.conf.tpl /tmp/php-fpm.conf.tpl
+COPY zz-docker.conf.tpl /tmp/zz-docker.conf.tpl
 
 EXPOSE 80
 
