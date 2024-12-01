@@ -1,17 +1,6 @@
 # Docker Nginx, PHP-FPM, Composer, Supervisor container
 
-By using supervisord to maintain Nginx, php-fpm 8 process in Centos 8 with misc utilities, such as composer
-
-## start minikube
-```
-minikube start
-```
-
-## setup docker-env with posershell
-```
-powershell
-minikube docker-env | Invoke-Expression
-```
+By using supervisord to maintain Nginx, php-fpm 8 process with misc utilities, such as composer & nodejs
 
 ## Build
 
