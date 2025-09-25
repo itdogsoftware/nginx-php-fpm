@@ -4,7 +4,7 @@ LABEL authors = "Roy To <roy.to@itdogsoftware.co>"
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 RUN bash -c "source ~/.bashrc && nvm install 18"
 # Install library & necessary service
-RUN apt-get update && apt-get install -y libzip-dev zip libpng-dev cron supervisor vim nodejs gettext-base nginx && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libzip-dev zip libfreetype6-dev libjpeg62-turbo-dev libpng-dev cron supervisor vim nodejs gettext-base && rm -rf /var/lib/apt/lists/*
 # Install docker php extensions
 RUN pecl install redis && docker-php-ext-enable redis
 RUN docker-php-ext-install mysqli 
