@@ -1,8 +1,8 @@
-FROM php:8.3.14-fpm-bullseye
-
+FROM php:8.4.11-fpm-bullseye
 LABEL authors = "Roy To <roy.to@itdogsoftware.co>"
-# Add nodejs repo
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+# Install NVM
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+RUN bash -c "source ~/.bashrc && nvm install 18"
 # Install library & necessary service
 RUN apt-get update && apt-get install -y libzip-dev zip libpng-dev cron supervisor vim nodejs gettext-base nginx && rm -rf /var/lib/apt/lists/*
 # Install docker php extensions
@@ -12,6 +12,7 @@ RUN docker-php-ext-install pdo
 RUN docker-php-ext-install pdo_mysql
 RUN docker-php-ext-install opcache
 RUN docker-php-ext-install zip
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 RUN docker-php-ext-install gd
 RUN docker-php-ext-install sockets
 RUN docker-php-ext-install pcntl
@@ -21,20 +22,25 @@ RUN mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 COPY docker-php-ext-opcache.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 # Update php config
 RUN sed -i "/memory_limit\s=\s/s/=.*/= 512M/" /usr/local/etc/php/php.ini
-
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-RUN rm -f /etc/nginx/sites-enabled/*
-COPY nginx.conf.tpl /tmp/nginx.conf.tpl
-COPY zz-docker.conf.tpl /tmp/zz-docker.conf.tpl
-
-EXPOSE 80
-
+# change php-fpm use socket in /socket/php-fpm.sock
+RUN sed -i "/listen\s=\s/s/=.*/= \/sock\/php-fpm.sock/" /usr/local/etc/php-fpm.d/zz-docker.conf
+# change listen mode to let containers talking to each other 
+RUN sed -i '/listen = \/sock\/php-fpm.sock/a listen.mode = 0777' /usr/local/etc/php-fpm.d/zz-docker.conf
+# tune up php-fpm config
+COPY www.conf /usr/local/etc/php-fpm.d/www.conf
+COPY nginx.conf /etc/nginx/nginx.conf
+# copy probe
 COPY listener.php /listener.php
+# Install composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# copy supervisor config to supervisor
 COPY supervisor.conf /etc/supervisor/conf.d/supervisor.conf
-RUN sed -i '/^\[supervisord\]/a user=root' /etc/supervisor/supervisord.conf
-COPY entrypoint.sh /entrypoint.sh
-RUN sed -i -e 's/\r$//' /entrypoint.sh
-RUN mkdir /run/supervisor
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+# non privileges updates
+RUN sed -i 's|/var/log/supervisor/supervisord.log|/tmp/supervisord.log|' /etc/supervisor/supervisord.conf \
+ && sed -i 's|childlogdir=/var/log/supervisor|childlogdir=/tmp|' /etc/supervisor/supervisord.conf \
+ && sed -i 's|pidfile=/var/run/supervisord.pid|pidfile=/tmp/supervisord.pid|' /etc/supervisor/supervisord.conf \
+ && sed -i 's|file=/var/run/supervisor.sock|file=/tmp/supervisor.sock|' /etc/supervisor/supervisord.conf \
+ && sed -i 's|serverurl=unix:///var/run/supervisor.sock|serverurl=unix:///tmp/supervisor.sock|' /etc/supervisor/supervisord.conf
+RUN rm -f /etc/nginx/sites-enabled/*
+ # Run supervisor
+CMD ["/bin/sh", "-c", "supervisord --nodaemon --configuration /etc/supervisor/supervisord.conf"]
