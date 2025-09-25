@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       job:
-        description: 'Select job to run'
+        description: 'Select job to run old'
         required: true
         default: 'build-test'
         type: choice
