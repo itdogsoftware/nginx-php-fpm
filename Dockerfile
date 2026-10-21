@@ -18,8 +18,6 @@ RUN docker-php-ext-install sockets
 RUN docker-php-ext-install pcntl
 # set production config
 RUN mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
-# enable opcache config
-COPY docker-php-ext-opcache.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 # Update php config
 RUN sed -i "/memory_limit\s=\s/s/=.*/= 512M/" /usr/local/etc/php/php.ini
 # change php-fpm use socket in /socket/php-fpm.sock
