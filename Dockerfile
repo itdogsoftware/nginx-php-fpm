@@ -4,7 +4,6 @@ LABEL authors = "Roy To <roy.to@itdogsoftware.co>"
 # Install library & necessary service
 RUN apt-get update && apt-get install -y libzip-dev zip libfreetype6-dev libjpeg62-turbo-dev libpng-dev libgmp-dev cron supervisor vim nodejs gettext-base nginx && rm -rf /var/lib/apt/lists/*
 # Install docker php extensions
-RUN nginx -v
 RUN curl -sS https://github.com/php/pie/releases/latest/download/pie.phar -o /usr/local/bin/pie \
     && chmod +x /usr/local/bin/pie \
     && pie install redis:6.3.0
